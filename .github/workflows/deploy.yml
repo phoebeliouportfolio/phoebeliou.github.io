@@ -1,15 +1,21 @@
-name: Sync WordPress Projects JSON
+name: Deploy site to GitHub Pages
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch: {}
-  repository_dispatch:
-    types: [wp_content_updated]
 
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
-  sync:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,15 +30,21 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Fetch WP → public/data/projects.json
-        env:
-          WP_BASE_URL: ${{ secrets.WP_BASE_URL }}
-        run: node scripts/fetch-projects.mjs
+      - name: Build
+        run: npm run build
 
-      - name: Commit & push if changed
-        run: |
-          git config user.name "wp-sync-bot"
-          git config user.email "wp-sync-bot@users.noreply.github.com"
-          git add public/data/projects.json
-          git diff --cached --quiet || git commit -m "Sync projects.json from WordPress"
-          git push
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
