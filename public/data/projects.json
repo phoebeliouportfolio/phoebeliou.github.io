@@ -1,1 +1,32 @@
-[]
+[
+  {
+    "id": 9,
+    "slug": "test-2",
+    "title": "Test 2",
+    "excerpt": "",
+    "content": "",
+    "date": "2025-12-31T23:24:58",
+    "modified": "2025-12-31T23:24:58",
+    "featuredImage": {
+      "src": "https://cms.phoebeliou.com/wp-content/uploads/2025/12/20251218_211907-576x1024.jpg",
+      "alt": "Test 2",
+      "width": 1018,
+      "height": 1809
+    }
+  },
+  {
+    "id": 6,
+    "slug": "test-1",
+    "title": "Test 1",
+    "excerpt": "",
+    "content": "",
+    "date": "2025-12-31T23:24:36",
+    "modified": "2025-12-31T23:24:36",
+    "featuredImage": {
+      "src": "https://cms.phoebeliou.com/wp-content/uploads/2025/12/20251231_022601-576x1024.jpg",
+      "alt": "Test 1",
+      "width": 1104,
+      "height": 1963
+    }
+  }
+]
