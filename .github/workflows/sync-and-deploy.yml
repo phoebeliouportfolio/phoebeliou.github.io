@@ -1,10 +1,9 @@
-name: Deploy site to GitHub Pages
+name: Sync WP content + Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch: {}
-
+  repository_dispatch:
+    types: [wp_content_updated]
 permissions:
   contents: read
   pages: write
@@ -15,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -30,7 +29,12 @@ jobs:
       - name: Install deps
         run: npm ci
 
-      - name: Build
+      - name: Sync projects.json from WordPress
+        env:
+          WP_BASE_URL: ${{ secrets.WP_BASE_URL }}
+        run: node scripts/fetch-projects.mjs
+
+      - name: Build site (Vite)
         run: npm run build
 
       - name: Upload Pages artifact
@@ -38,13 +42,6 @@ jobs:
         with:
           path: dist
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
